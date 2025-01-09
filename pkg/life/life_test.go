@@ -6,13 +6,11 @@ import (
 
 func TestNeighbors(t *testing.T) {
 	testCases := []struct {
-		name     string
 		world    *World
 		x, y     int
 		expected int
 	}{
 		{
-			name: "Пустой мир 3x3",
 			world: func() *World {
 				w := NewWorld(3, 3)
 				return w
@@ -22,7 +20,6 @@ func TestNeighbors(t *testing.T) {
 			expected: 0,
 		},
 		{
-			name: "Одна живая клетка сверху",
 			world: func() *World {
 				w := NewWorld(3, 3)
 				w.Cells[0][1] = true
@@ -33,7 +30,6 @@ func TestNeighbors(t *testing.T) {
 			expected: 1,
 		},
 		{
-			name: "Все соседи живые",
 			world: func() *World {
 				w := NewWorld(3, 3)
 				for i := 0; i < 3; i++ {
@@ -48,9 +44,8 @@ func TestNeighbors(t *testing.T) {
 			expected: 8,
 		},
 		{
-			name: "Проверка угловой клетки",
 			world: func() *World {
-				w := life.NewWorld(3, 3)
+				w := NewWorld(3, 3)
 				w.Cells[0][1] = true
 				w.Cells[1][0] = true
 				w.Cells[1][1] = true
@@ -61,7 +56,6 @@ func TestNeighbors(t *testing.T) {
 			expected: 3,
 		},
 		{
-			name: "Проверка граничной клетки",
 			world: func() *World {
 				w := NewWorld(3, 3)
 				w.Cells[0][0] = true
@@ -76,12 +70,89 @@ func TestNeighbors(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			got := tc.world.Neighbors(tc.x, tc.y)
-			if got != tc.expected {
-				t.Errorf("Neighbors(%d, %d) = %d; want %d",
-					tc.x, tc.y, got, tc.expected)
-			}
-		})
+		got := tc.world.Neighbors(tc.x, tc.y)
+		if got != tc.expected {
+			t.Errorf("Neighbors(%d, %d) = %d; want %d",
+				tc.x, tc.y, got, tc.expected)
+		}
+	}
+}
+
+func TestNext(t *testing.T) {
+	testCases := []struct {
+		world    *World
+		x, y     int
+		expected bool
+	}{
+		{
+			world: func() *World {
+				w := NewWorld(3, 3)
+				w.Cells[0][0] = true
+				w.Cells[0][1] = true
+				w.Cells[1][0] = true
+				return w
+			}(),
+			x:        1,
+			y:        1,
+			expected: true,
+		},
+		{
+			world: func() *World {
+				w := NewWorld(3, 3)
+				w.Cells[0][0] = true
+				w.Cells[0][1] = true
+				w.Cells[1][1] = true
+				return w
+			}(),
+			x:        1,
+			y:        1,
+			expected: true,
+		},
+		{
+			world: func() *World {
+				w := NewWorld(3, 3)
+				w.Cells[0][0] = true
+				w.Cells[0][1] = true
+				w.Cells[1][0] = true
+				w.Cells[1][1] = true
+				return w
+			}(),
+			x:        1,
+			y:        1,
+			expected: true,
+		},
+		{
+			world: func() *World {
+				w := NewWorld(3, 3)
+				w.Cells[0][0] = true
+				w.Cells[0][1] = true
+				w.Cells[0][2] = true
+				w.Cells[1][0] = true
+				w.Cells[1][1] = true
+				return w
+			}(),
+			x:        1,
+			y:        1,
+			expected: false,
+		},
+		{
+			world: func() *World {
+				w := NewWorld(3, 3)
+				w.Cells[0][0] = true
+				w.Cells[0][1] = true
+				return w
+			}(),
+			x:        1,
+			y:        1,
+			expected: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		got := tc.world.Next(tc.x, tc.y)
+		if got != tc.expected {
+			t.Errorf("Next(%d, %d) = %v; want %v",
+				tc.x, tc.y, got, tc.expected)
+		}
 	}
 }

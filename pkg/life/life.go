@@ -1,9 +1,7 @@
 package life
 
 import (
-	"fmt"
 	"math/rand"
-	"time"
 )
 
 type World struct {
@@ -72,17 +70,22 @@ func (w *World) Seed() {
 	}
 }
 
-func main() {
-	height := 10
-	width := 10
-	currentWorld := NewWorld(height, width)
-	nextWorld := NewWorld(height, width)
-	currentWorld.Seed()
-	for {
-		fmt.Println(currentWorld)
-		NextState(currentWorld, nextWorld)
-		currentWorld = nextWorld
-		time.Sleep(100 * time.Millisecond)
-		fmt.Print("\033[H\033[2J")
+func (w *World) String() string {
+	var (
+		str         string
+		brownSquare = "\xF0\x9F\x9F\xAB"
+		greenSquare = "\xF0\x9F\x9F\xA9"
+	)
+
+	for y := 0; y < w.Height; y++ {
+		for x := 0; x < w.Width; x++ {
+			if w.Cells[y][x] {
+				str += greenSquare
+			} else {
+				str += brownSquare
+			}
+		}
+		str += "\n"
 	}
+	return str
 }
