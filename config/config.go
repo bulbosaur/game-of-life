@@ -8,8 +8,7 @@ import (
 type Config struct {
 	Height    int    `json:"height"`
 	Width     int    `json:"width"`
-	StateDir  string `json:"dir"`
-	StateFile string `json:"filename"`
+	StatePath string `json:"statepath"`
 }
 
 func GettingConfig(filePath string) (*Config, error) {

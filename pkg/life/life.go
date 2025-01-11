@@ -3,6 +3,7 @@ package life
 import (
 	"math/rand"
 	"os"
+	"path/filepath"
 )
 
 type World struct {
@@ -95,6 +96,12 @@ func (w *World) SaveState(filename string) error {
 	var (
 		str string
 	)
+
+	dir := filepath.Dir(filename)
+	err := os.MkdirAll(dir, 0777)
+	if err != nil {
+		return err
+	}
 
 	f, err := os.Create(filename)
 	if err != nil {

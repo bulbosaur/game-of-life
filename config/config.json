@@ -1,6 +1,5 @@
 {
-    "dir": "game-of-life\\tmp",
-    "filename": "state.txt",
+    "statepath": "..\\..\\tmp\\state.txt",
     "height": 10,
     "width": 10
 }

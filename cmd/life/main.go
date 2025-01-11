@@ -18,7 +18,7 @@ func main() {
 	nextWorld := life.NewWorld(cfg.Height, cfg.Width)
 	currentWorld.Seed()
 	for {
-		currentWorld.SaveState("state.txt")
+		currentWorld.SaveState(cfg.StatePath)
 		fmt.Println(currentWorld.String())
 		life.NextState(currentWorld, nextWorld)
 		currentWorld = nextWorld
