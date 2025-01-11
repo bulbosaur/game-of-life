@@ -2,18 +2,23 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"time"
 
+	"github.com/bulbosaur/game-of-life/config"
 	"github.com/bulbosaur/game-of-life/pkg/life"
 )
 
 func main() {
-	height := 10
-	width := 10
-	currentWorld := life.NewWorld(height, width)
-	nextWorld := life.NewWorld(height, width)
+	cfg, err := config.GettingConfig("..\\..\\config\\config.json")
+	if err != nil {
+		log.Fatal("Config error:", err)
+	}
+	currentWorld := life.NewWorld(cfg.Height, cfg.Width)
+	nextWorld := life.NewWorld(cfg.Height, cfg.Width)
 	currentWorld.Seed()
 	for {
+		currentWorld.SaveState("state.txt")
 		fmt.Println(currentWorld.String())
 		life.NextState(currentWorld, nextWorld)
 		currentWorld = nextWorld

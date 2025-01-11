@@ -2,6 +2,7 @@ package life
 
 import (
 	"math/rand"
+	"os"
 )
 
 type World struct {
@@ -88,4 +89,39 @@ func (w *World) String() string {
 		str += "\n"
 	}
 	return str
+}
+
+func (w *World) SaveState(filename string) error {
+	var (
+		str string
+	)
+
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		errClose := f.Close()
+		if err == nil {
+			err = errClose
+		}
+	}()
+
+	for y := 0; y < w.Height; y++ {
+		for x := 0; x < w.Width; x++ {
+			if w.Cells[y][x] {
+				str += "1"
+			} else {
+				str += "0"
+			}
+		}
+		if y+1 != w.Height {
+			str += "\n"
+		}
+	}
+
+	_, err = f.WriteString(str)
+
+	return err
 }
