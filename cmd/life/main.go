@@ -10,19 +10,25 @@ import (
 )
 
 func main() {
-	// var currentWorld *life.World
+	var (
+		currentWorld, nextWorld *life.World
+	)
 
 	cfg, err := config.GettingConfig("..\\..\\config\\config.json")
 	if err != nil {
 		log.Fatal("Config error:", err)
 	}
-	// currentWorld.LoadState(cfg.StatePath)
-	// if err != nil {
-	// 	currentWorld = life.NewWorld(cfg.Height, cfg.Width)
-	// }
-	currentWorld := life.NewWorld(cfg.Height, cfg.Width)
-	nextWorld := life.NewWorld(cfg.Height, cfg.Width)
+
+	// if !life.EmptyStateFile(cfg.StatePath) {
+	// 	err = currentWorld.LoadState(cfg.StatePath)
+	// 	if err != nil {
+
+	// 	}
+	// } else {
+	currentWorld = life.NewWorld(cfg.Height, cfg.Width)
+	nextWorld = life.NewWorld(cfg.Height, cfg.Width)
 	currentWorld.Seed()
+	// }
 	for {
 		currentWorld.SaveState(cfg.StatePath)
 		fmt.Println(currentWorld.String())

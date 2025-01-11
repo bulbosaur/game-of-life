@@ -147,8 +147,7 @@ func hasManyUnique(slice []int) bool {
 
 func (w *World) LoadState(filename string) error {
 	var (
-		x         int
-		y         int
+		x, y      int
 		allWidths []int
 	)
 
@@ -197,4 +196,9 @@ func (w *World) LoadState(filename string) error {
 	}
 
 	return nil
+}
+
+func EmptyStateFile(filename string) bool {
+	data, _ := os.ReadFile(filename)
+	return len(data) > 0
 }
