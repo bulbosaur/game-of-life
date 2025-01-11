@@ -1,6 +1,8 @@
 package life
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -153,6 +155,78 @@ func TestNext(t *testing.T) {
 		if got != tc.expected {
 			t.Errorf("Next(%d, %d) = %v; want %v",
 				tc.x, tc.y, got, tc.expected)
+		}
+	}
+}
+
+func TestSaveState(t *testing.T) {
+	tmpDir := "test_tmp"
+	defer os.RemoveAll(tmpDir)
+
+	tests := []struct {
+		world    *World
+		filename string
+		want     string
+		wantErr  bool
+	}{
+		{
+			world: &World{
+				Height: 3,
+				Width:  3,
+				Cells: [][]bool{
+					{true, false, true},
+					{false, true, false},
+					{true, false, true},
+				},
+			},
+			filename: filepath.Join(tmpDir, "test1.txt"),
+			want:     "101\n010\n101",
+			wantErr:  false,
+		},
+		{
+			world: &World{
+				Height: 2,
+				Width:  2,
+				Cells: [][]bool{
+					{true, true},
+					{false, false},
+				},
+			},
+			filename: filepath.Join(tmpDir, "test2.txt"),
+			want:     "11\n00",
+			wantErr:  false,
+		},
+		{
+			world: &World{
+				Height: 1,
+				Width:  1,
+				Cells: [][]bool{
+					{true},
+				},
+			},
+			filename: filepath.Join(tmpDir, "test3.txt"),
+			want:     "1",
+			wantErr:  false,
+		},
+	}
+
+	for _, tt := range tests {
+		err := tt.world.SaveState(tt.filename)
+
+		if (err != nil) != tt.wantErr {
+			t.Errorf("SaveState() error = %v, wantErr %v", err, tt.wantErr)
+			return
+		}
+
+		content, err := os.ReadFile(tt.filename)
+		if err != nil {
+			t.Errorf("Failed to read test file: %v", err)
+			return
+		}
+
+		got := string(content)
+		if got != tt.want {
+			t.Errorf("SaveState() content = %v, want %v", got, tt.want)
 		}
 	}
 }
