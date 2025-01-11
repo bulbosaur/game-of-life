@@ -1,9 +1,16 @@
 package life
 
 import (
+	"bufio"
+	"errors"
 	"math/rand"
 	"os"
 	"path/filepath"
+)
+
+var (
+	ErrorFieldSize        = errors.New("dimensions in the file: different number of elements in lines")
+	ErrorInvalidCharacter = errors.New("invalid character in LoadState file")
 )
 
 type World struct {
@@ -107,13 +114,7 @@ func (w *World) SaveState(filename string) error {
 	if err != nil {
 		return err
 	}
-
-	defer func() {
-		errClose := f.Close()
-		if err == nil {
-			err = errClose
-		}
-	}()
+	defer f.Close()
 
 	for y := 0; y < w.Height; y++ {
 		for x := 0; x < w.Width; x++ {
@@ -129,6 +130,71 @@ func (w *World) SaveState(filename string) error {
 	}
 
 	_, err = f.WriteString(str)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
+}
+
+func hasManyUnique(slice []int) bool {
+	unique := make(map[int]bool)
+	for _, v := range slice {
+		unique[v] = true
+	}
+	return len(unique) > 1
+}
+
+func (w *World) LoadState(filename string) error {
+	var (
+		x         int
+		y         int
+		allWidths []int
+	)
+
+	f, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+
+	for scanner.Scan() {
+		y++
+		x += len(scanner.Text())
+		allWidths = append(allWidths, x)
+	}
+
+	if hasManyUnique(allWidths) {
+		return ErrorFieldSize
+	}
+
+	w.Height = y
+	w.Width = x
+
+	w.Cells = make([][]bool, w.Height)
+	for i := range w.Cells {
+		w.Cells[i] = make([]bool, w.Width)
+	}
+
+	f.Seek(0, 0)
+	scanner = bufio.NewScanner(f)
+
+	y = 0
+	for scanner.Scan() {
+		line := scanner.Text()
+		for x := 0; x < len(line); x++ {
+			if string(line[x]) == "1" {
+				w.Cells[y][x] = true
+			} else if string(line[x]) == "0" {
+				w.Cells[y][x] = false
+			} else {
+				return ErrorInvalidCharacter
+			}
+		}
+		y++
+	}
+
+	return nil
 }
