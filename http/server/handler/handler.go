@@ -2,9 +2,11 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/bulbosaur/game-of-life/config"
 	"github.com/bulbosaur/game-of-life/internal/service"
 )
 
@@ -38,10 +40,20 @@ func Decorate(next http.Handler, ds ...Decorator) http.Handler {
 }
 
 func (ls *LifeStates) nextState(w http.ResponseWriter, r *http.Request) {
+	cfg, err := config.GettingConfig("..\\..\\config\\config.json")
+	if err != nil {
+		log.Fatal("Config error:", err)
+	}
+
 	worldState := ls.LifeService.NewState()
 
-	err := json.NewEncoder(w).Encode(worldState.Cells)
+	err = worldState.SaveState(cfg.StatePath)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Fatal("Saving is faled")
 	}
+
+	worldString := worldState.String()
+
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprintf(w, worldString)
 }
